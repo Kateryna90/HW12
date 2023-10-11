@@ -1,57 +1,65 @@
 package org.example.task1;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
-public class FizzBuzz implements Runnable  {
+import java.util.function.IntConsumer;
+
+class FizzBuzz {
     private int n;
-    private int current;
-    private Object lock;
-
-    private BlockingQueue<String> queue;
-
+    private int curr = 1;
 
     public FizzBuzz(int n) {
         this.n = n;
-        this.current = 1;
-        this.lock = new Object();
-        this.queue = new LinkedBlockingQueue<>();
     }
 
-    @Override
-    public void run() {
-        String name = Thread.currentThread().getName();
-        while (current <= n) {
-            synchronized (lock) {
-                if (current % 3 == 0 && current % 5 == 0) {
-                    if (name.equals("C")) {
-                        queue.add("fizzbuzz");
-                        current++;
-                    }
-                }
-                else if (current % 3 == 0) {
-                    if (name.equals("A")) {
-                        queue.add("fizz");
-                        current++;
-                    }
-                }
-                else if (current % 5 == 0) {
-                    if (name.equals("B")) {
-                        queue.add("buzz");
-                        current++;
-                    }
-                }
-                else {
-                    queue.add(String.valueOf(current));
-                    current++;
-                }
+
+    public synchronized void fizz(Runnable printFizz) throws InterruptedException {
+        while (curr <= n) {
+            if (curr % 3 == 0 && curr % 5 != 0) {
+                printFizz.run();
+                curr++;
+                notifyAll();
+            } else {
+                wait();
             }
         }
     }
 
-    public void number() throws InterruptedException {
-        String s = queue.poll();
-        if (s != null) {
-            System.out.print(s + ", ");
+
+    public synchronized void buzz(Runnable printBuzz) throws InterruptedException {
+        while (curr <= n) {
+            if (curr % 3 != 0 && curr % 5 == 0) {
+                printBuzz.run();
+                curr++;
+                notifyAll();
+            } else {
+                wait();
+            }
+        }
+    }
+
+
+    public synchronized void fizzbuzz(Runnable printFizzBuzz) throws InterruptedException {
+        while (curr <= n) {
+            if (curr % 15 == 0) {
+                printFizzBuzz.run();
+                curr++;
+                notifyAll();
+            } else {
+                wait();
+            }
+        }
+    }
+
+
+    public synchronized void number(IntConsumer printNumber) throws InterruptedException {
+        while (curr <= n) {
+            if (curr % 3 != 0 && curr % 5 != 0) {
+                printNumber.accept(curr);
+                curr++;
+                notifyAll();
+            } else {
+                wait();
+            }
         }
     }
 }
+

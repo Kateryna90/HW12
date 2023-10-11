@@ -1,35 +1,58 @@
 package org.example.task1;
 
+import java.util.function.IntConsumer;
+
+
 public class FizzBuzzProgram {
     public static void main(String[] args) throws InterruptedException {
-
         int n = 15;
+        FizzBuzz fb = new FizzBuzz(n);
 
+        Runnable printFizz = () -> System.out.print("fizz, ");
+        Runnable printBuzz = () -> System.out.print("buzz, ");
+        Runnable printFizzBuzz = () -> System.out.print("fizzbuzz, ");
+        IntConsumer printNumber = (x) -> System.out.print(x + ", ");
 
-        FizzBuzz fizzBuzz = new FizzBuzz(n);
+        Thread t1 = new Thread(() -> {
+            try {
+                fb.fizz(printFizz);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
 
+        Thread t2 = new Thread(() -> {
+            try {
+                fb.buzz(printBuzz);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
 
-        Thread A = new Thread(fizzBuzz, "A");
-        Thread B = new Thread(fizzBuzz, "B");
-        Thread C = new Thread(fizzBuzz, "C");
-        Thread D = new Thread(fizzBuzz, "D");
+        Thread t3 = new Thread(() -> {
+            try {
+                fb.fizzbuzz(printFizzBuzz);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
 
+        Thread t4 = new Thread(() -> {
+            try {
+                fb.number(printNumber);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
 
-        A.start();
-        B.start();
-        C.start();
-        D.start();
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
 
-
-        A.join();
-        B.join();
-        C.join();
-        D.join();
-
-
-        System.out.println("\nРезультат: ");
-        for (int i = 1; i <= n; i++) {
-            fizzBuzz.number();
-        }
+        t1.join();
+        t2.join();
+        t3.join();
+        t4.join();
     }
 }
